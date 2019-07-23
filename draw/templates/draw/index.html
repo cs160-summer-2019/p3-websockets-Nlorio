@@ -82,23 +82,36 @@
       var point;
      
       // If user not in users -> add user and generate color and new path
-//       if (user_socket == socket) {
       
       user_socket = path_coord.userno;
-       if (!(user_socket in users)) {
-         var path_u = new paper.Path();
-//          path_u.strokeColor = path_coord.color;
-         users[user_socket] = path_u;
-       }
-     
-     	users[user_socket].strokeColor = path_coord.color;
-      point = new paper.Point(path_coord.x, path_coord.y); // build new point 
-      users[user_socket].add(point);
-        
-//       }
-    	 
       
+      if (url.indexOf('small') != -1) {
+      	if (user_socket == usernum) {
+          if (!(user_socket in users)) {
+           	var path_u = new paper.Path();
+           	users[user_socket] = path_u;
+		       	users[user_socket].strokeColor = path_coord.color;
+    	     	point = new paper.Point(path_coord.x, path_coord.y); // build new point 
+      	   	users[user_socket].add(point);
+        	}
+          else {
+            users[user_socket].strokeColor = path_coord.color;
+            point = new paper.Point(path_coord.x, path_coord.y); // build new point 
+            users[user_socket].add(point);
+          }
+     		}
+      }
       
+     	else {
+         if (!(user_socket in users)) {
+           var path_u = new paper.Path();
+           users[user_socket] = path_u;
+         }
+
+         users[user_socket].strokeColor = path_coord.color;
+         point = new paper.Point(path_coord.x, path_coord.y); // build new point 
+         users[user_socket].add(point);
+      }
       
 
     };
