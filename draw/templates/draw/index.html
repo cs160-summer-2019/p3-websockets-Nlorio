@@ -27,45 +27,79 @@
 
     // getting the URL (you may want to use for Exercise 3)
     var url = window.location.href;
-
+		
+    var users = {}
+  	var colors = [];
+   
+  
+    function getRandomColor() {
+      var letters = '0123456789ABCDEF';
+      var color = '#';
+      for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+      }
+      return color;
+  	}
+ 
+  
+  	// Set user color
+  	var user_color = getRandomColor();
+  
+    while (user_color in colors) { // Loop till select an unused color
+      user_color = getRandomColor();
+    };
+  
+    colors.push(user_color); 
+ 
+  	// Set user number
+    var usernum = Math.random();
+  
+  
     // On mouse move interaction.
     tool.onMouseMove = function(event) {
-        // Draw locally
-        var drawing_path = {
-            x: event.point.x,
-            y: event.point.y
-           
-        };
-        
-        socket.send(JSON.stringify(drawing_path));
+      var drawing_path = {
+        x: event.point.x,
+        y: event.point.y, 
+        userno: usernum,
+        color: user_color
+      };
+     
+      socket.send(JSON.stringify(drawing_path));
     };
 
+  
 
     // Send drawing through websocket
     var socket = new WebSocket('wss:/p3-websockets-Nlorio-nlorio535274.codeanyapp.com/ws/draw');
-//     http(s)://p3-websockets-Nlorio-nlorio535274.codeanyapp.com
   
-    first = true;
-  	var myPath;
+//     first = true;
+//   	var myPath;
     // triggered when receiving a new drawing from the server
     socket.onmessage = function(str_path) {
         // Mimic path from server on the websocket clientele
-     
-      
+      console.log(socket)
       var path_coord = JSON.parse(str_path.data);  
       var point;
-      if (first) {
-            myPath = new paper.Path();
-            myPath.strokeColor = 'black';
-            point = new paper.Point(path_coord.x, path_coord.y);
-            myPath.add(point);
-            first = false;
-        }
-        else {
-//             var path_coord = (JSON.parse(str_path.data));
-            point = new paper.Point(path_coord.x, path_coord.y);
-            myPath.add(point);
-        }
+     
+      // If user not in users -> add user and generate color and new path
+//       if (user_socket == socket) {
+      
+      user_socket = path_coord.userno;
+       if (!(user_socket in users)) {
+         var path_u = new paper.Path();
+//          path_u.strokeColor = path_coord.color;
+         users[user_socket] = path_u;
+       }
+     
+     	users[user_socket].strokeColor = path_coord.color;
+      point = new paper.Point(path_coord.x, path_coord.y); // build new point 
+      users[user_socket].add(point);
+        
+//       }
+    	 
+      
+      
+      
 
     };
 
