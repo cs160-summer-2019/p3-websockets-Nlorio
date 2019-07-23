@@ -28,8 +28,52 @@
     // getting the URL (you may want to use for Exercise 3)
     var url = window.location.href;
 
-    // var socket = new WebSocket(
-    //     'wss://<your url here>/ws/draw');
+    // On mouse move interaction.
+    var drawing_path;
+    tool.onmousemove = function(event) {
+        // Draw locally
+        drawing_path = {
+            x: event.point.x,
+            y: event.point.y,
+            user: null
+        };
+        socket.send(JSON.stringify(JSON.stringify(drawing_path)));
+
+        // socket.onopen = () => socket.send(JSON.stringify(drawing_path));
+    };
+
+
+
+
+    // Send drawing through websocket
+    var socket = new WebSocket('wss://0.0.0.0:3000/ws/draw');
+    first = true;
+    // triggered when receiving a new drawing from the server
+    socket.onmessage = function(str_path) {
+        console.log("Path Element Received!");
+        // Mimic path from server on the websocket clientele
+        if (first) {
+            var myPath = new paper.Path();
+            myPath.strokeColor = 'black';
+            first = false;
+        }
+        else {
+            var path_coord = (JSON.parse(str_path.data));
+            var point = new paper.point(path_coord.x, path_coord.y);
+            myPath.add(point);
+            console.log('hello world');
+        }
+
+    };
+
+
+
+    // notify console if socket closes unexpectedly
+    socket.onclose = function(e) {
+        console.error('Drawing socket closed unexpectedly');
+    };
+
+
 
 
 </script>
