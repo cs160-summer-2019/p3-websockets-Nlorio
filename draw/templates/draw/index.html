@@ -54,6 +54,9 @@
   	// Set user number
     var usernum = Math.random();
   
+  	// Set thickness 
+  	var line_thick = 5;
+  
   
     // On mouse move interaction.
     tool.onMouseMove = function(event) {
@@ -61,7 +64,9 @@
         x: event.point.x,
         y: event.point.y, 
         userno: usernum,
-        color: user_color
+        color: user_color,
+        thick: line_thick
+        
       };
      
       socket.send(JSON.stringify(drawing_path));
@@ -77,7 +82,7 @@
     // triggered when receiving a new drawing from the server
     socket.onmessage = function(str_path) {
         // Mimic path from server on the websocket clientele
-      console.log(socket)
+//       console.log(socket)
       var path_coord = JSON.parse(str_path.data);  
       var point;
      
@@ -91,11 +96,13 @@
            	var path_u = new paper.Path();
            	users[user_socket] = path_u;
 		       	users[user_socket].strokeColor = path_coord.color;
+		       	users[user_socket].strokeWidth = path_coord.thick;
     	     	point = new paper.Point(path_coord.x, path_coord.y); // build new point 
       	   	users[user_socket].add(point);
         	}
           else {
             users[user_socket].strokeColor = path_coord.color;
+            users[user_socket].strokeWidth = path_coord.thick;
             point = new paper.Point(path_coord.x, path_coord.y); // build new point 
             users[user_socket].add(point);
           }
@@ -106,12 +113,13 @@
          if (!(user_socket in users)) {
            var path_u = new paper.Path();
            users[user_socket] = path_u;
-         }
+         };
 
          users[user_socket].strokeColor = path_coord.color;
+         users[user_socket].strokeWidth = path_coord.thick;
          point = new paper.Point(path_coord.x, path_coord.y); // build new point 
          users[user_socket].add(point);
-      }
+      };
       
 
     };
@@ -124,6 +132,44 @@
     };
 
 
+  
+//   Mobile Gesture Code Here
+  
+  
+  
+  $(document).ready(() => {
+    
+    window.addEventListener("devicemotion", (event) => {
+      if ((Math.abs(event.acceleration.x) > 20) || (Math.abs(event.acceleration.y) > 20) || (Math.abs(event.acceleration.z) > 20)) {
+          paper.project.clear();
+//         	paper.project.activeLayer.removeChildren()
+          }
+		});
+    
+    window.addEventListener("deviceorientation", (event) => {
+      if (event.gamma > 40) { // tilt right
+        user_color = getRandomColor();
+       }
+		});
+    
+    window.addEventListener("deviceorientation", (event) => {
+      if (event.gamma < -40) { // tilt left
+        // change thickness of path line 
+        line_thick = 10;
+       }
+		});
+    
+    
+    window.addEventListener("deviceorientation", (event) => {
+      if (event.beta < -10) { // tilt left
+        // change color to black
+        user_color = 'black';
+       }
+		});
+    
+	});
+  
+  
 
 
 </script>
