@@ -127,7 +127,8 @@
         y: event.point.y, 
         userno: usernum,
         color: user_color,
-        thick: line_thick
+        thick: line_thick,
+        answers: [answer_a, answer_b, answer_c, answer_d]
         
       };
      
@@ -145,9 +146,18 @@
     socket.onmessage = function(str_path) {
         // Mimic path from server on the websocket clientele
 //       console.log(socket)
+      
       var path_coord = JSON.parse(str_path.data);  
       var point;
-     
+    
+      // Load in answer board results and display results 
+      var answer = path_coord.answers;
+      document.getElementById("A").innerHTML = "A: " + answer[0].length;
+      document.getElementById("B").innerHTML = "B: " + answer[1].length;
+      document.getElementById("C").innerHTML = "C: " + answer[2].length;
+      document.getElementById("D").innerHTML = "D: " + answer[3].length;
+      
+      
       // If user not in users -> add user and generate color and new path
       
       user_socket = path_coord.userno;
